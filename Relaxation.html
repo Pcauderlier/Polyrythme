@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color : black;
+            height : 100vh;
+            width : 100%;
+        }
+
+        #paper {
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="paper"></canvas>
+    <script>
+        soundEnable = false
+        document.onvisibilitychange = () => soundEnable = false;
+        
+
+        const audioList = [
+        new Audio("./audio/note1.mp3"),
+        new Audio("./audio/note2.mp3"),
+        new Audio("./audio/note3.mp3"),
+        new Audio("./audio/note4.mp3"),
+        new Audio("./audio/note5.mp3"),
+        new Audio("./audio/note6.mp3"),
+        new Audio("./audio/note7.mp3"),
+        new Audio("./audio/note8.mp3"),
+        new Audio("./audio/note9.mp3"),
+        new Audio("./audio/note10.mp3"),
+        new Audio("./audio/note11.mp3"),
+        new Audio("./audio/note12.mp3"),
+        new Audio("./audio/note13.mp3"),
+        new Audio("./audio/note14.mp3"),
+        new Audio("./audio/note15.mp3"),
+        ]
+        for (let aud of audioList){
+            aud.volume = 0.05
+        }
+        const paper = document.getElementById('paper'),
+        pen = paper.getContext("2d");
+        paper.onclick = ()=> { soundEnable = !soundEnable; console.log(soundEnable)}
+        let startTime = new Date().getTime();
+        const draw = () => {
+
+        let color = [
+        "#b01592",
+        "#b61561",
+        "#c81664",
+        "#951359",
+        "#741151",
+        "#4e0b40",
+        "#41114b",
+        "#32195d",
+        "#301c64",
+        "#281c68",
+        "#211d69",
+        "#211547",
+        "#21123b",
+        "#170d25",
+        "#280e33"
+        ]
+        const now = new Date().getTime()
+        
+        paper.width = paper.clientWidth;
+        paper.height = paper.clientHeight;
+        pen.strokeStyle = "white";
+        pen.lineWidth = 6;
+        // Ligne 
+        pen.beginPath();
+        pen.moveTo(paper.width*0.9, paper.height*0.9);
+        pen.lineTo(paper.width*0.1, paper.height*0.9);
+        pen.stroke();
+        
+        const center = {
+            x : paper.width*0.5,
+            y : paper.height * 0.9
+        };
+        
+        
+        const timePassed =  (now - startTime) / 1000
+        
+        const arc = (r,color) =>{
+            
+            pen.beginPath();
+            pen.strokeStyle = color
+            pen.arc(center.x,center.y,r,Math.PI,0)
+            pen.stroke()
+        }
+        
+        const boule = (r,speed,index) => {
+            
+            let impactTime = Math.PI / speed ;
+            let distanceAng = (Math.PI + (timePassed * speed)) % (2*Math.PI)
+            let finalAngle = distanceAng >= Math.PI ? distanceAng : 2*Math.PI-distanceAng
+            if (soundEnable && timePassed % impactTime < 0.05){
+                audioList[index].play()
+                
+            }
+            pen.beginPath();
+            pen.fillStyle = distanceAng >= Math.PI ? "white" : "red"
+            pen.arc(center.x+r * Math.cos(finalAngle),center.y+r*Math.sin(finalAngle),10,0,2*Math.PI)
+            pen.fill()
+        }
+
+        let index = 0
+        let sp = 0.8
+        for (let r = paper.width*0.05; r <= paper.width*0.4; r+= paper.width*0.025){
+            arc(r,color[index]);
+            boule(r,sp,index)
+        
+            sp -= 0.02
+            index++
+        }
+            requestAnimationFrame(draw)
+        }
+
+        draw()
+    </script>
+</body>
+</html>
